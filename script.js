@@ -1,274 +1,92 @@
-const pages = [
-  ["Home", "index.html"], ["Services", "services.html"],
-  ["Industries", "industries.html"], ["Work", "work.html"],
-  ["About", "about.html"], ["Process", "process.html"],
-  ["Pricing", "pricing.html"], ["Contact", "contact.html"]
+const pageLinks = [
+  ["Home", "index.html", "home"], ["Services", "services.html", "services"],
+  ["Industries", "industries.html", "industries"], ["Work", "work.html", "work"],
+  ["About", "about.html", "about"], ["Process", "process.html", "process"],
+  ["Pricing", "pricing.html", "pricing"], ["Contact", "contact.html", "contact"]
 ];
 
-const current = document.body.dataset.page || "Home";
-const header = document.querySelector("#site-header");
-header.innerHTML = `
-  <header class="topbar">
-    <div class="shell navrow">
-      <a class="brand" href="index.html" aria-label="Navrix Technologies home"><img src="assets/navrix-mark.svg" alt=""></a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navlinks">Menu</button>
-      <nav id="navlinks" class="navlinks" aria-label="Main navigation">
-        ${pages.map(([name, url]) => `<a href="${url}" ${name === current ? 'aria-current="page"' : ""} class="${name === "Contact" ? "nav-cta" : ""}">${name}</a>`).join("")}
-      </nav>
-    </div>
-  </header>`;
+const pageData = {
+  services: { eyebrow: "What we do", title: "One clear idea.\nBuilt across every touchpoint.", intro: "From a first impression to the systems behind it, we shape digital work around what people need to do.", model: "knot" },
+  industries: { eyebrow: "Different contexts, considered work", title: "Made for your people.\nReady for your context.", intro: "We work across sectors, learning the audience, workflow, and constraints before choosing the right digital approach.", model: "orbit" },
+  work: { eyebrow: "Selected explorations", title: "Ideas, made tangible.", intro: "A few independent design studies show how a clear point of view can shape a useful digital experience.", model: "frame" },
+  about: { eyebrow: "About Navrix", title: "A thoughtful partner\nfor your next digital move.", intro: "Navrix Technologies brings creative direction and practical technology together, with care for the people on both sides of the screen.", model: "prism" },
+  process: { eyebrow: "How we work", title: "Clear steps.\nRoom to think.", intro: "A direct, collaborative process keeps the goal visible and makes the next decision easier at every stage.", model: "stack" },
+  pricing: { eyebrow: "Project pricing", title: "A clear scope\ncomes before a quote.", intro: "Every project has a different shape. We start by understanding the need, then outline the work and assumptions together.", model: "glass" },
+  contact: { eyebrow: "Start a conversation", title: "What are you\ntrying to make possible?", intro: "Share a little about the challenge. This form is a visual preview until a real message-delivery service is connected.", model: "contact" }
+};
 
-const footer = document.querySelector("#site-footer");
-footer.innerHTML = `
-  <footer class="footer">
-    <div class="shell">
-      <div class="footer-grid">
-        <div>
-          <a class="brand" href="index.html" aria-label="Navrix Technologies home"><img src="assets/navrix-mark.svg" alt=""></a>
-          <p>Navrix Technologies connects digital direction, social content, interface design, and engineering to make every part of an online presence feel more considered.</p>
-        </div>
-        <div><h4>Explore</h4><div class="footer-links">${pages.slice(1, 6).map(([name, url]) => `<a href="${url}">${name}</a>`).join("")}</div></div>
-        <div><h4>Plan your next step</h4><div class="footer-links"><a href="pricing.html">Pricing approach</a><a href="work.html">Concept work</a><a href="contact.html">Contact setup</a></div></div>
-      </div>
-      <div class="footer-bottom"><p>© <span id="year"></span> Navrix Technologies</p><p>Clear thinking. Useful technology.</p></div>
-    </div>
-  </footer>`;
-document.querySelector("#year").textContent = new Date().getFullYear();
+const serviceItems = [
+  ["01", "Digital direction", "Find a useful story, the right audience, and a clear next step before production begins."],
+  ["02", "Social content", "Plan a consistent social presence with purposeful content and a recognizable visual voice."],
+  ["03", "Websites & commerce", "Create a responsive, accessible website that makes the offer and next action easy to understand."],
+  ["04", "Web applications", "Design and build focused tools, portals, and product experiences around real workflows."],
+  ["05", "Systems & support", "Connect everyday tools, improve handoffs, and keep digital products maintained over time."]
+];
+const concepts = [
+  { no: "01", title: "Studio Index", tag: "Brand presence · Concept", copy: "A calm, editorial home for a creative practice.", type: "index" },
+  { no: "02", title: "Orbit Commerce", tag: "Product experience · Concept", copy: "A tactile product page with a direct route to explore.", type: "orbit" },
+  { no: "03", title: "Field Notes", tag: "Social direction · Concept", copy: "A flexible campaign system built around one idea.", type: "field" }
+];
 
-const toggle = document.querySelector(".menu-toggle");
-const nav = document.querySelector("#navlinks");
-function closeMenu() {
-  nav.classList.remove("open");
-  toggle.setAttribute("aria-expanded", "false");
-  toggle.textContent = "Menu";
-}
-toggle.addEventListener("click", () => {
-  const open = nav.classList.toggle("open");
-  toggle.setAttribute("aria-expanded", String(open));
-  toggle.textContent = open ? "Close" : "Menu";
-});
-nav.addEventListener("click", event => {
-  if (event.target.closest("a")) closeMenu();
-});
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && nav.classList.contains("open")) {
-    closeMenu();
-    toggle.focus();
-  }
-});
-document.addEventListener("click", event => {
-  if (nav.classList.contains("open") && !event.target.closest(".navrow")) closeMenu();
-});
+const current = document.body.dataset.page || "home";
+const brand = `<a class="brand" href="index.html" aria-label="Navrix Technologies home"><img src="assets/navrix-mark.svg" alt=""><span>NAVRIX <small>TECHNOLOGIES</small></span></a>`;
+document.querySelector("#site-header").innerHTML = `<header class="topbar"><div class="nav-shell">${brand}<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button><nav id="site-nav" class="nav-links" aria-label="Main navigation">${pageLinks.map(([name,url,key])=>`<a href="${url}" ${key===current?'aria-current="page"':''}>${name}</a>`).join("")}</nav><a class="nav-action" href="contact.html">Let’s talk <span>↗</span></a></div></header>`;
 
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const revealSelectors = [
-  "#main section:not(.hero):not(.page-hero) .section-head",
-  "#main section:not(.hero):not(.page-hero) .card",
-  "#main section:not(.hero):not(.page-hero) .industry-card",
-  "#main section:not(.hero):not(.page-hero) .service-row",
-  "#main section:not(.hero):not(.page-hero) .process-step",
-  "#main section:not(.hero):not(.page-hero) .pricing-step",
-  "#main section:not(.hero):not(.page-hero) .value-row",
-  "#main section:not(.hero):not(.page-hero) .project",
-  "#main section:not(.hero):not(.page-hero) .cta-band",
-  "#main section:not(.hero):not(.page-hero) .form-panel",
-  "#main section:not(.hero):not(.page-hero) .callout"
-].join(",");
-document.querySelectorAll(revealSelectors).forEach(item => {
-  if (!item.parentElement.closest(".reveal")) item.classList.add("reveal");
-});
-const revealItems = [...document.querySelectorAll("#main .reveal")];
+const hero = ({eyebrow,title,intro,model="home",dark=false}) => `<section class="page-hero ${dark?'page-hero-dark':''}"><div class="hero-grid"><div class="hero-copy"><p class="eyebrow"><i></i>${eyebrow}</p><h1>${title.split("\n").map((line,i)=>`<span class="${i===1?'hero-accent':''}">${line}</span>`).join("")}</h1><p class="hero-intro">${intro}</p><div class="hero-actions"><a class="button button-dark" href="services.html">Explore what we do <span>↗</span></a><a class="text-action" href="work.html">See concept work <span>↓</span></a></div></div><div class="hero-art" data-model="${model}" role="img" aria-label="Abstract dimensional Navrix brand sculpture"><canvas class="hero-canvas" aria-hidden="true"></canvas><div class="art-label"><span>IDEAS / INTERFACE / IMPACT</span><b>NRX—01</b></div><div class="art-spark spark-a"></div><div class="art-spark spark-b"></div></div></div><a class="scroll-cue" href="#content"><span>Scroll to explore</span><i></i></a></section>`;
 
-if (!reducedMotion && window.gsap && window.ScrollTrigger) {
+const conceptMarkup = (item) => `<article class="concept reveal"><div class="concept-art concept-${item.type}"><div class="concept-browser"><div class="browser-bar"><i></i><i></i><i></i><span>${item.tag}</span></div><div class="browser-content"><small>${item.no} / NAVRIX STUDY</small><strong>${item.title}</strong><div class="browser-graphic"></div><em>Explore concept ↗</em></div></div><span class="concept-stamp">CONCEPT<br>STUDY</span></div><div class="concept-caption"><div><span>${item.tag}</span><h3>${item.title}</h3><p>${item.copy}</p></div><b>↗</b></div></article>`;
+
+function homePage(){return `${hero({eyebrow:"Digital studio · Social · Software",title:"Make your next\ndigital move matter.",intro:"We bring your brand, website, and digital tools into focus—so people know where to look and what to do next.",model:"home"})}<div class="marquee" aria-label="Digital direction, social presence, web experiences, useful products"><div class="marquee-track">${Array.from({length:2},()=>`<span>Digital direction <b>✳</b> Social presence <b>✳</b> Web experiences <b>✳</b> Useful products <b>✳</b> Content with purpose <b>✳</b>`).join("")}</div></div><section id="content" class="section section-offer"><div class="section-heading reveal"><p class="eyebrow"><i></i>What we bring together</p><h2>Good digital work<br>works <em>as one.</em></h2><p>Make each part feel considered—from the first scroll to the last handoff.</p></div><div class="offer-list">${serviceItems.slice(0,4).map(([n,title,copy])=>`<a class="offer-row reveal" href="services.html"><span>${n}</span><div><h3>${title}</h3><p>${copy}</p></div><b>↗</b></a>`).join("")}</div></section><section class="section section-ink"><div class="ink-intro reveal"><p class="eyebrow eyebrow-yellow"><i></i>Why Navrix</p><h2>Clear ideas.<br><span>Carefully made.</span></h2></div><div class="values-grid"><article class="value reveal"><b>✳</b><h3>Useful by design</h3><p>Start with the person, the task, and the simplest helpful next step.</p></article><article class="value reveal"><b>◈</b><h3>Creative with intent</h3><p>Give every interaction and visual choice a reason to be there.</p></article><article class="value reveal"><b>↗</b><h3>Built to hold up</h3><p>Pair a thoughtful front end with reliable, maintainable technology.</p></article></div></section><section class="section section-work"><div class="section-title-row reveal"><div><p class="eyebrow"><i></i>Independent explorations</p><h2>Concepts in motion.</h2></div><a class="text-action" href="work.html">All concept work <span>↗</span></a></div><div class="concept-grid">${concepts.map(conceptMarkup).join("")}</div><p class="concept-disclaimer">These are original concept studies, not commissioned client work.</p></section><section class="section section-industries"><div class="industry-intro reveal"><p class="eyebrow"><i></i>Industry-neutral by design</p><h2>Different worlds.<br><em>Same care.</em></h2><p>We learn what matters in your context before deciding what to make.</p></div><div class="industry-chips">${["Commerce","Education","Wellbeing","Hospitality","Professional services","Community"].map((x,i)=>`<span class="industry-chip reveal"><b>0${i+1}</b>${x}</span>`).join("")}</div></section><section class="section section-price-tease"><div class="price-tease-panel reveal"><div><p class="eyebrow eyebrow-yellow"><i></i>Pricing, with clarity</p><h2>No guesswork.<br><em>Just a useful scope.</em></h2><p>We’ll understand the need and responsibilities before proposing a price. No invented packages.</p></div><a class="button button-yellow" href="pricing.html">How pricing works <span>↗</span></a><div class="glass-orbit" aria-hidden="true"></div></div></section><section class="section section-cta"><div class="cta-copy reveal"><p class="eyebrow"><i></i>Have a challenge in mind?</p><h2>Let’s make the<br><span>next step clearer.</span></h2><a class="button button-dark" href="contact.html">Start an enquiry <span>↗</span></a></div><div class="cta-note reveal"><span class="note-mark">N</span><p>Websites. Digital products.<br>Social presence. Systems that connect.</p></div></section>`;}
+
+function servicesPage(){return `${hero({...pageData.services})}<section id="content" class="section section-offer"><div class="section-heading reveal"><p class="eyebrow"><i></i>Connected capabilities</p><h2>Choose what the work <em>needs.</em></h2><p>Bring us a defined brief or a question you’re still working through.</p></div><div class="offer-list">${serviceItems.map(([n,title,copy])=>`<article class="offer-row reveal"><span>${n}</span><div><h3>${title}</h3><p>${copy}</p></div><b>↗</b></article>`).join("")}</div></section><section class="section section-ink"><div class="ink-intro reveal"><p class="eyebrow eyebrow-yellow"><i></i>One joined-up team</p><h2>Think it through.<br><span>Make it real.</span></h2><p>Direction, design, development, and launch can work together—or stand on their own where that makes more sense.</p><a class="button button-yellow" href="process.html">See our process <span>↗</span></a></div><div class="service-visual reveal"><div class="service-node node-one">Direction</div><div class="service-node node-two">Design</div><div class="service-node node-three">Technology</div><div class="service-line"></div><small>ONE SHARED POINT OF VIEW</small></div></section>`;}
+
+function industriesPage(){const contexts=[["01","Commerce","Product discovery, storefronts, and smoother service journeys."],["02","Education","Clearer learning resources, enrollment flows, and connected portals."],["03","Wellbeing","Approachable information, booking journeys, and thoughtful digital access."],["04","Hospitality","Useful guest information, discovery, and service touchpoints."],["05","Professional services","A sharper digital presence and easier ways to understand an offer."],["06","Community","Spaces that help people find information, participate, and connect."]];return `${hero({...pageData.industries})}<section id="content" class="section section-industries"><div class="section-heading reveal"><p class="eyebrow"><i></i>Where digital can help</p><h2>Start with the context.<br><em>Not a template.</em></h2><p>These are examples of common needs—not sector specialisms or claims about past clients.</p></div><div class="context-list">${contexts.map(([n,name,copy])=>`<article class="context-row reveal"><span>${n}</span><h3>${name}</h3><p>${copy}</p><b>↗</b></article>`).join("")}</div></section><section class="section section-ink"><div class="ink-intro reveal"><p class="eyebrow eyebrow-yellow"><i></i>Our starting point</p><h2>Understand the<br><span>real-world task.</span></h2><p>Who needs this? What are they trying to do? What already exists? The answers shape the right solution.</p><a class="button button-yellow" href="contact.html">Tell us what you need <span>↗</span></a></div></section>`;}
+
+function workPage(){return `${hero({...pageData.work,dark:true})}<section id="content" class="section section-work section-inkwork"><div class="section-title-row reveal"><div><p class="eyebrow eyebrow-yellow"><i></i>Navrix concept studies</p><h2>Exploring how it could feel.</h2></div><p>Clearly labelled ideas to make the possibilities tangible.</p></div><div class="concept-grid">${concepts.map(conceptMarkup).join("")}</div><p class="concept-disclaimer">All projects shown here are concepts made for demonstration. They are not client work, testimonials, or performance claims.</p></section><section class="section section-cta"><div class="cta-copy reveal"><p class="eyebrow"><i></i>Your idea goes here</p><h2>Let’s design something<br><span>for your context.</span></h2><a class="button button-dark" href="contact.html">Start an enquiry <span>↗</span></a></div></section>`;}
+
+function aboutPage(){return `${hero({...pageData.about})}<section id="content" class="section section-about"><div class="about-statement reveal"><p class="eyebrow"><i></i>Our point of view</p><h2>Technology is better<br>when it feels <em>human.</em></h2></div><div class="about-copy reveal"><p>Navrix Technologies is a digital studio for people who want their online presence to feel clearer and work harder.</p><p>We bring social content, web experiences, and software engineering under one roof, then shape the mix around the actual challenge. No pre-set industry playbook. No unnecessary complexity.</p><a class="text-action" href="services.html">Explore our capabilities <span>↗</span></a></div></section><section class="section section-ink"><div class="ink-intro reveal"><p class="eyebrow eyebrow-yellow"><i></i>How we show up</p><h2>Thoughtful work.<br><span>Open collaboration.</span></h2></div><div class="values-grid"><article class="value reveal"><b>01</b><h3>Listen first</h3><p>Understand the people, context, and constraints before choosing a direction.</p></article><article class="value reveal"><b>02</b><h3>Make it clear</h3><p>Keep the decisions, language, and next steps easy to follow.</p></article><article class="value reveal"><b>03</b><h3>Build with care</h3><p>Choose a level of technology that fits the need and can be maintained.</p></article></div></section>`;}
+
+function processPage(){const steps=[["01","Discover","Get clear on the audience, the problem, and what a useful outcome looks like."],["02","Shape","Set the scope, map the experience, and make design decisions visible."],["03","Build","Develop in focused steps, review progress, and test the important journeys."],["04","Launch & support","Prepare the handover, release carefully, and discuss what ongoing care is needed."]];return `${hero({...pageData.process})}<section id="content" class="section section-process"><div class="process-heading reveal"><p class="eyebrow"><i></i>From question to launch</p><h2>Make the next decision<br><em>at the right time.</em></h2></div><div class="process-list">${steps.map(([n,name,copy])=>`<article class="process-row reveal"><span>${n}</span><div class="process-node"></div><div><h3>${name}</h3><p>${copy}</p></div></article>`).join("")}</div></section><section class="section section-ink"><div class="ink-intro reveal"><p class="eyebrow eyebrow-yellow"><i></i>Work together</p><h2>One clear step<br><span>at a time.</span></h2><p>How much detail each stage needs depends on the project. We agree the scope and responsibilities before work begins.</p><a class="button button-yellow" href="contact.html">Talk through a project <span>↗</span></a></div></section>`;}
+
+function pricingPage(){const options=[["01","Digital presence","A focused website or campaign experience.","Website · Content · Brand direction"],["02","Digital product","A web app or product experience shaped around real workflows.","Discovery · UX/UI · Development"],["03","Ongoing care","An agreed rhythm for updates and improvements.","Maintenance · Integrations · Support"]];return `${hero({...pageData.pricing,dark:true})}<section id="content" class="section section-pricing"><div class="pricing-heading reveal"><p class="eyebrow eyebrow-yellow"><i></i>No one-size-fits-all package</p><h2>Choose a direction.<br><em>We’ll shape the scope.</em></h2><p>These are conversation starters, not fixed packages or prices. We’ll confirm a quote after understanding the work.</p></div><div class="pricing-glass-grid">${options.map(([n,title,copy,list],i)=>`<article class="pricing-glass reveal ${i===1?'pricing-featured':''}"><span class="plan-index">${n} / STARTING POINT</span><h3>${title}</h3><p>${copy}</p><div class="plan-divider"></div><small>${list.split(" · ").map(x=>`<span><i>✓</i>${x}</span>`).join("")}</small><a class="button ${i===1?'button-yellow':'button-light'}" href="contact.html">Discuss this direction <b>↗</b></a></article>`).join("")}</div><p class="pricing-footnote">No prices are published. Scope, timeline, and costs are agreed directly before any work begins.</p></section><section class="section section-ink"><div class="pricing-how reveal"><p class="eyebrow eyebrow-yellow"><i></i>How a quote takes shape</p><div><h2>Understand it.<br><em>Then price it.</em></h2><ol><li>Tell us what you’re trying to improve.</li><li>We’ll clarify the scope, assumptions, and dependencies.</li><li>You’ll review the proposal before committing.</li></ol></div></div></section>`;}
+
+function contactPage(){return `${hero({...pageData.contact,dark:true})}<section id="content" class="section section-contact"><div class="contact-heading reveal"><p class="eyebrow eyebrow-yellow"><i></i>Enquiry preview</p><h2>Start with the<br><em>important bit.</em></h2><p>What are you trying to make easier, clearer, or possible?</p></div><div class="contact-glass-grid"><div class="contact-glass reveal"><span class="glass-kicker">A GOOD PLACE TO BEGIN</span><h3>What should we know?</h3><p>A short description is enough. You don’t need a formal brief.</p><div class="contact-prompt"><i>01</i><span>What is the challenge?</span></div><div class="contact-prompt"><i>02</i><span>Who is it for?</span></div><div class="contact-prompt"><i>03</i><span>What would help?</span></div><p class="contact-status"><b></b> Preview only — no message is sent</p></div><form class="contact-glass contact-form reveal" id="contact-form"><span class="glass-kicker">YOUR ENQUIRY</span><label>Your name <input name="name" autocomplete="name" placeholder="Name" required></label><label>Email address <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label><label>What do you need? <select name="topic"><option value="">Choose a starting point</option><option>Website or digital presence</option><option>Web application or product</option><option>Social content or direction</option><option>Not sure yet</option></select></label><label>A little context <textarea name="message" rows="3" placeholder="What are you trying to make possible?"></textarea></label><button class="button button-pink" type="submit">Preview enquiry <span>↗</span></button><p class="form-disclaimer" id="form-status" role="status">This form is not connected to message delivery. Don’t enter sensitive information.</p></form></div></section>`;}
+
+const renderers={home:homePage,services:servicesPage,industries:industriesPage,work:workPage,about:aboutPage,process:processPage,pricing:pricingPage,contact:contactPage};
+document.querySelector("#main").innerHTML=(renderers[current]||homePage)();
+document.querySelector("#site-footer").innerHTML=`<footer class="footer"><div class="footer-main">${brand}<p>Digital direction, social presence,<br>web experiences, useful technology.</p><a class="footer-cta" href="contact.html">Have a project in mind? <b>Let’s talk ↗</b></a></div><div class="footer-nav"><span>EXPLORE</span>${pageLinks.slice(1).map(([name,url])=>`<a href="${url}">${name}</a>`).join("")}</div><div class="footer-bottom"><span>© ${new Date().getFullYear()} Navrix Technologies</span><span>Made with intention.</span><a href="#top">Back to top ↑</a></div></footer>`;
+document.querySelectorAll(".page-hero").forEach(el=>el.id="top");
+
+const toggle=document.querySelector(".menu-toggle"),nav=document.querySelector(".nav-links");
+function closeMenu(){toggle?.setAttribute("aria-expanded","false");toggle&&(toggle.textContent="Menu");nav?.classList.remove("is-open");}
+toggle?.addEventListener("click",()=>{const open=toggle.getAttribute("aria-expanded")!=="true";toggle.setAttribute("aria-expanded",String(open));toggle.textContent=open?"Close":"Menu";nav.classList.toggle("is-open",open);});
+nav?.addEventListener("click",event=>{if(event.target.closest("a"))closeMenu();});
+document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMenu();});
+
+const dialog=document.createElement("dialog");
+dialog.className="enquiry-dialog";
+dialog.innerHTML=`<button class="dialog-close" type="button" aria-label="Close enquiry form">×</button><p class="eyebrow eyebrow-yellow"><i></i>One last thing</p><h2>Want to tell us<br>what you’re planning?</h2><p class="dialog-copy">Preview only. No message is delivered; only completion of this prompt is remembered on this device.</p><form class="dialog-form"><label>Name <input name="name" autocomplete="name" placeholder="Your name" required></label><label>Email <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label><label class="dialog-wide">What are you thinking about? <textarea name="message" rows="2" placeholder="A website, product, campaign…"></textarea></label><button class="button button-yellow dialog-submit" type="submit">Complete preview <span>↗</span></button><p class="dialog-status" role="status"></p></form>`;
+document.body.append(dialog);
+dialog.querySelector(".dialog-close").addEventListener("click",()=>dialog.close());
+dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close();});
+const completionKey="navrix-enquiry-completed-v1";
+const completedBefore=()=>{try{return localStorage.getItem(completionKey)==="1";}catch{return false;}};
+const alreadyShown=()=>{try{return sessionStorage.getItem("navrix-enquiry-shown-v2")==="1";}catch{return false;}};
+const openEnquiry=()=>{if(!completedBefore()&&!alreadyShown()&&!dialog.open&&typeof dialog.showModal==="function"){try{sessionStorage.setItem("navrix-enquiry-shown-v2","1");}catch{}dialog.showModal();}};
+// Open only when the visitor is genuinely near the document end. Observing the
+// footer with a positive root margin could fire early, then stay suppressed.
+const checkPageEnd=()=>{const doc=document.documentElement;const remaining=doc.scrollHeight-(window.scrollY+window.innerHeight);if(remaining<=Math.max(100,window.innerHeight*.12))openEnquiry();};
+window.addEventListener("scroll",checkPageEnd,{passive:true});
+window.addEventListener("resize",checkPageEnd,{passive:true});
+window.addEventListener("load",()=>requestAnimationFrame(checkPageEnd),{once:true});
+window.addEventListener("pageshow",()=>requestAnimationFrame(checkPageEnd));
+for(const form of document.querySelectorAll(".dialog-form,.contact-form"))form.addEventListener("submit",event=>{event.preventDefault();if(form.matches(".dialog-form")){try{localStorage.setItem(completionKey,"1");}catch{}}const status=form.querySelector("[role='status']");if(status)status.textContent=form.matches(".dialog-form")?"Preview completed. Your message was not sent or saved; only the completion preference was saved on this device, so the prompt won’t appear again.":"Preview only. Your message was not sent or saved.";});
+
+if(window.gsap&&window.ScrollTrigger&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
   gsap.registerPlugin(ScrollTrigger);
-  document.documentElement.classList.add("gsap-ready");
-  const intro = [...document.querySelectorAll(".hero-copy .eyebrow, .hero-copy h1, .hero-copy > p, .hero-copy .hero-actions, .hero-copy .hero-proof, .page-hero .breadcrumbs, .page-hero .eyebrow, .page-hero h1, .page-hero p")];
-  if (intro.length) gsap.fromTo(intro, { autoAlpha: 0, y: 42, filter: "blur(8px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1.05, stagger: 0.095, ease: "power4.out", clearProps: "transform,filter" });
-  const visual = document.querySelector(".hero-architecture");
-  if (visual) gsap.fromTo(visual, { autoAlpha: 0, scale: 0.87, y: 34, rotateX: 8 }, { autoAlpha: 1, scale: 1, y: 0, rotateX: 0, duration: 1.4, ease: "power3.out", delay: 0.25, clearProps: "transform" });
-  revealItems.forEach(item => gsap.fromTo(item,
-    { autoAlpha: 0, y: 46, filter: "blur(7px)" },
-    { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1.05, ease: "power4.out", clearProps: "filter,transform", scrollTrigger: { trigger: item, start: "top 86%", once: true } }
-  ));
-  document.querySelectorAll("#main section").forEach(section => {
-    const visualItems = section.querySelectorAll(".project-scene, .principle-panel, .form-panel, .process-track, .industries-note");
-    visualItems.forEach((item, index) => {
-      item.classList.add("motion-art");
-      gsap.fromTo(item, { y: 24 + index * 4, rotateX: 3 }, { y: -18, rotateX: 0, ease: "none", scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: 0.65 } });
-    });
-    if (section.classList.contains("hero") || section.classList.contains("page-hero")) {
-      gsap.to(section, { backgroundPosition: "50% 14%", ease: "none", scrollTrigger: { trigger: section, start: "top top", end: "bottom top", scrub: 0.7 } });
-    }
-  });
-  document.querySelectorAll(".process-track .process-step").forEach(step => {
-    ScrollTrigger.create({ trigger: step, start: "top 66%", end: "bottom 45%", onToggle: self => step.classList.toggle("is-active", self.isActive) });
-  });
-  const serviceList = document.querySelector(".service-list");
-  if (serviceList) gsap.to(serviceList, { "--story-progress": 1, ease: "none", scrollTrigger: { trigger: serviceList, start: "top 70%", end: "bottom 70%", scrub: true } });
-  const heroVisual = document.querySelector(".hero-visual");
-  if (heroVisual) gsap.to(heroVisual, { y: -70, rotateZ: -1, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.8 } });
-
-  // A pinned, three chapter scrollytelling sequence on the home page.
-  const story = document.querySelector(".story-section");
-  if (story && window.innerWidth > 900) {
-    const chapters = [...story.querySelectorAll(".story-chapter")];
-    const panels = [...story.querySelectorAll(".story-panel")];
-    const steps = [...story.querySelectorAll(".story-steps span")];
-    if (chapters.length === 3 && panels.length === 3) {
-      story.classList.add("is-pinned");
-      gsap.set(chapters.slice(1), { autoAlpha: 0, y: 28 });
-      gsap.set(panels.slice(1), { autoAlpha: 0, scale: 0.94, y: 38, rotateY: 5 });
-      const storyTimeline = gsap.timeline({
-        scrollTrigger: { trigger: story, start: "top top+=78", end: "+=1950", scrub: 0.8, pin: story.querySelector(".story-pin"), anticipatePin: 1 }
-      });
-      for (let index = 0; index < 2; index += 1) {
-        const at = index * 1.05;
-        storyTimeline.to(chapters[index], { autoAlpha: 0, y: -25, duration: 0.34 }, at)
-          .fromTo(chapters[index + 1], { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.34 }, at + 0.16)
-          .to(panels[index], { autoAlpha: 0, scale: 0.96, y: -24, rotateY: -4, duration: 0.38 }, at)
-          .fromTo(panels[index + 1], { autoAlpha: 0, scale: 0.94, y: 38, rotateY: 5 }, { autoAlpha: 1, scale: 1, y: 0, rotateY: 0, duration: 0.42 }, at + 0.17);
-      }
-      storyTimeline.eventCallback("onUpdate", () => {
-        const activeStep = Math.min(2, Math.floor(storyTimeline.progress() * 3));
-        steps.forEach((step, index) => step.classList.toggle("is-active", index === activeStep));
-      });
-    }
-  }
-
-  // Let portfolio art and editorial headings resolve as each section enters view.
-  document.querySelectorAll("#main .project-scene").forEach(scene => {
-    gsap.fromTo(scene, { clipPath: "inset(12% 8% 12% 8% round 14px)", scale: 0.94 }, { clipPath: "inset(0% 0% 0% 0% round 12px)", scale: 1, ease: "none", scrollTrigger: { trigger: scene, start: "top 88%", end: "center 55%", scrub: 0.7 } });
-  });
-  document.querySelectorAll("#main .section-head h2, #main .copy-wide h2, #main .cta-band h2").forEach(heading => {
-    gsap.fromTo(heading, { y: 34, clipPath: "inset(0 0 38% 0)" }, { y: 0, clipPath: "inset(0 0 0% 0)", ease: "none", scrollTrigger: { trigger: heading, start: "top 91%", end: "top 58%", scrub: 0.55 } });
-  });
-} else if (revealItems.length && !reducedMotion && "IntersectionObserver" in window) {
-  document.documentElement.classList.add("js-ready");
-  const observer = new IntersectionObserver((entries, activeObserver) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        activeObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: "0px 0px -32px 0px" });
-  revealItems.forEach(item => observer.observe(item));
-}
-
-const progress = document.createElement("div");
-progress.className = "top-progress";
-progress.setAttribute("aria-hidden", "true");
-document.body.prepend(progress);
-if (window.gsap && window.ScrollTrigger && !reducedMotion) {
-  gsap.to(progress, { scaleX: 1, ease: "none", scrollTrigger: { trigger: document.documentElement, start: "top top", end: "bottom bottom", scrub: 0.25 } });
-}
-
-const ticker = document.createElement("div");
-ticker.className = "ticker";
-ticker.setAttribute("aria-label", "Digital direction, social presence, web experiences, useful products");
-ticker.innerHTML = `<div class="ticker-track" aria-hidden="true">${Array.from({ length: 2 }, () => `<span class="ticker-item">Digital direction</span><span class="ticker-item">Social presence</span><span class="ticker-item">Web experiences</span><span class="ticker-item">Useful products</span><span class="ticker-item">Content with purpose</span>`).join("")}</div>`;
-const firstSection = document.querySelector("#main > section");
-if (firstSection) firstSection.after(ticker);
-
-if (!reducedMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-  document.querySelectorAll(".card, .project, .principle-panel, .form-panel, .cta-band").forEach(item => {
-    item.addEventListener("pointermove", event => {
-      const bounds = item.getBoundingClientRect();
-      const x = (event.clientX - bounds.left) / bounds.width;
-      const y = (event.clientY - bounds.top) / bounds.height;
-      item.style.setProperty("--pointer-x", `${x * 100}%`);
-      item.style.setProperty("--pointer-y", `${y * 100}%`);
-      item.style.setProperty("--tilt-x", `${(0.5 - y) * 3}deg`);
-      item.style.setProperty("--tilt-y", `${(x - 0.5) * 4}deg`);
-    });
-    item.addEventListener("pointerleave", () => {
-      item.style.setProperty("--tilt-x", "0deg");
-      item.style.setProperty("--tilt-y", "0deg");
-    });
-  });
-}
-
-const transition = document.createElement("div");
-transition.className = "page-transition";
-transition.setAttribute("aria-hidden", "true");
-transition.innerHTML = '<img src="assets/navrix-mark.svg" alt="">';
-document.body.append(transition);
-if (!reducedMotion && window.gsap) {
-  document.addEventListener("click", event => {
-    const link = event.target.closest('a[href]');
-    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;
-    const destination = new URL(link.href, window.location.href);
-    if (destination.origin !== window.location.origin || destination.pathname === window.location.pathname || destination.hash) return;
-    event.preventDefault();
-    gsap.to(transition, { clipPath: "inset(0% 0 0)", duration: 0.55, ease: "power4.inOut", onComplete: () => { window.location.href = destination.href; } });
-  });
-}
-
-const formStatusButton = document.querySelector("#form-status-preview");
-if (formStatusButton) formStatusButton.addEventListener("click", () => {
-  document.querySelector("#form-status").textContent = "This preview is not connected to an inbox or backend. Nothing was sent or stored.";
-});
-
-const heroVisual = document.querySelector(".hero-visual");
-if (heroVisual && !reducedMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-  heroVisual.addEventListener("pointermove", event => {
-    const bounds = heroVisual.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    heroVisual.style.setProperty("--tilt-y", `${x * 7}deg`);
-    heroVisual.style.setProperty("--tilt-x", `${-y * 5}deg`);
-  });
-  heroVisual.addEventListener("pointerleave", () => {
-    heroVisual.style.setProperty("--tilt-y", "0deg");
-    heroVisual.style.setProperty("--tilt-x", "0deg");
-  });
-}
-
-// End-of-page enquiry prompt. It is a frontend preview only: nothing is transmitted or stored.
-if (current.toLowerCase() !== "contact" && "HTMLDialogElement" in window) {
-  let alreadyPrompted = false;
-  try { alreadyPrompted = sessionStorage.getItem("navrix-enquiry-prompted") === "yes"; } catch (_) {}
-  if (!alreadyPrompted) {
-    const dialog = document.createElement("dialog");
-    dialog.className = "enquiry-dialog";
-    dialog.setAttribute("aria-labelledby", "enquiry-title");
-    dialog.innerHTML = `
-      <div class="enquiry-dialog-head"><div><span class="eyebrow warm">A useful place to begin</span><h2 id="enquiry-title">Tell us what you’re trying to make possible.</h2></div><button class="enquiry-close" type="button" aria-label="Close enquiry form">×</button></div>
-      <p class="enquiry-note">This enquiry preview is not connected yet. Nothing you enter is sent or saved.</p>
-      <form class="enquiry-popup-form" novalidate>
-        <label for="popup-name">Name <span>optional</span><input id="popup-name" name="name" autocomplete="name" placeholder="Your name"></label>
-        <label for="popup-email">Email <span>optional</span><input id="popup-email" name="email" type="email" autocomplete="email" placeholder="Your email address"></label>
-        <label class="popup-full" for="popup-topic">What are you exploring?<select id="popup-topic" name="topic"><option value="">Choose an area</option><option>Social content and digital handling</option><option>Website or digital presence</option><option>Web application or portal</option><option>Business system or workflow</option><option>Product design or strategy</option><option>Not sure yet</option></select></label>
-        <label class="popup-full" for="popup-message">A little about the challenge <span>optional</span><textarea id="popup-message" name="message" rows="3" placeholder="What would you like to improve?"></textarea></label>
-        <div class="popup-actions"><button class="button primary" type="submit">Review enquiry <span class="arrow">→</span></button><span id="popup-status" role="status" aria-live="polite"></span></div>
-      </form>`;
-    document.body.append(dialog);
-    const closeButton = dialog.querySelector(".enquiry-close");
-    const popupForm = dialog.querySelector(".enquiry-popup-form");
-    const status = dialog.querySelector("#popup-status");
-    let opener = null;
-    const closeDialog = () => {
-      dialog.close();
-      popupForm.reset();
-      status.textContent = "";
-      try { sessionStorage.setItem("navrix-enquiry-prompted", "yes"); } catch (_) {}
-      if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
-    };
-    closeButton.addEventListener("click", closeDialog);
-    dialog.addEventListener("click", event => { if (event.target === dialog) closeDialog(); });
-    dialog.addEventListener("cancel", event => { event.preventDefault(); closeDialog(); });
-    popupForm.addEventListener("submit", event => {
-      event.preventDefault();
-      status.textContent = "Preview only. The enquiry has not been delivered or saved.";
-      status.classList.add("is-visible");
-    });
-    const footerObserver = new IntersectionObserver(entries => {
-      if (!entries.some(entry => entry.isIntersecting) || dialog.open) return;
-      opener = document.activeElement;
-      dialog.showModal();
-      closeButton.focus();
-    }, { threshold: 0.04, rootMargin: "0px 0px 40px 0px" });
-    const siteFooter = document.querySelector("#site-footer");
-    if (siteFooter) footerObserver.observe(siteFooter);
-  }
+  gsap.fromTo(".hero-copy > *",{y:28,autoAlpha:0},{y:0,autoAlpha:1,duration:.8,stagger:.08,ease:"power3.out",delay:.12});
+  document.querySelectorAll(".reveal").forEach((item,index)=>gsap.fromTo(item,{y:32,autoAlpha:0},{y:0,autoAlpha:1,duration:.75,delay:(index%3)*.045,ease:"power3.out",scrollTrigger:{trigger:item,start:"top 88%",once:true}}));
+  gsap.to(".hero-art",{yPercent:20,rotate:3,ease:"none",scrollTrigger:{trigger:".page-hero",start:"top top",end:"bottom top",scrub:.7}});
+  gsap.to(".marquee-track",{xPercent:-18,ease:"none",scrollTrigger:{trigger:".marquee",start:"top bottom",end:"bottom top",scrub:.5}});
+  document.querySelectorAll(".concept-art").forEach((art,i)=>gsap.to(art,{y:i%2?-20:18,ease:"none",scrollTrigger:{trigger:art,start:"top bottom",end:"bottom top",scrub:.8}}));
 }
